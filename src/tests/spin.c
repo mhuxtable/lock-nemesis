@@ -1,6 +1,6 @@
 
-#include <linux/slab.h>
 #include <linux/spinlock.h>
+#include <linux/vmalloc.h>
 
 #include <test.h>
 
@@ -9,10 +9,7 @@ static spinlock_t *locks = NULL;
 static void ln_spin_setup(unsigned buckets)
 {
 	int lock;
-	locks = (spinlock_t *) kmalloc(sizeof(spinlock_t) * buckets, GFP_KERNEL);
-	
-	if (IS_ERR_OR_NULL(locks))
-		BUG();
+	locks = (spinlock_t *) vmalloc(sizeof(spinlock_t) * buckets);
 	
 	for (lock = 0; lock < buckets; lock++)
 		spin_lock_init(&locks[lock]);
@@ -22,28 +19,19 @@ static void ln_spin_setup(unsigned buckets)
 
 static void ln_spin_lock(unsigned bucket)
 {
-	if (unlikely(!locks))
-		BUG();
-	
 	spin_lock(&locks[bucket]);
 	return;
 }
 
 static void ln_spin_unlock(unsigned bucket)
 {
-	if (unlikely(!locks))
-		BUG();
-	
 	spin_unlock(&locks[bucket]);
 	return;
 }
 
 static void ln_spin_teardown(void)
 {
-	if (unlikely(!locks))
-		BUG();
-	
-	kfree(locks);
+	vfree(locks);
 	locks = NULL;
 	
 	return;
