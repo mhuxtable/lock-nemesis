@@ -11,6 +11,7 @@ static struct task_struct *thr_test;
 extern int ln_test_run_all(void);
 
 extern ln_test_t test_none;
+extern ln_test_t test_spin;
 
 void ln_sims_register_all(void)
 {
