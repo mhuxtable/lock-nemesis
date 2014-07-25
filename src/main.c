@@ -9,7 +9,15 @@
 
 static struct task_struct *thr_test;
 extern int ln_test_run_all(void);
-extern void ln_sims_register_all(void);
+
+extern ln_test_t test_none;
+
+void ln_sims_register_all(void)
+{
+	ln_test_register(&test_none);
+	ln_test_register(&test_spin);
+	return;
+}
 
 static int __init locking_init(void)
 {

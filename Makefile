@@ -7,7 +7,8 @@ $(KERNEL_OBJ)-objs += src/main.o
 $(KERNEL_OBJ)-objs += src/rnd.o
 $(KERNEL_OBJ)-objs += src/stat.o
 $(KERNEL_OBJ)-objs += src/test.o
-$(KERNEL_OBJ)-objs += src/sims.o
+
+$(KERNEL_OBJ)-objs += src/tests/no_locks.o
 	
 KDIR=/lib/modules/$(shell uname -r)/build
 #KDIR=/local/scratch/mjh233/qemu-linux/linux-3.13.1/

@@ -2,9 +2,9 @@
 #include <test.h>
 
 /* No locks */
-static void * no_setup(unsigned buckets)
+static void no_setup(unsigned buckets)
 {
-	return NULL;
+	return;
 }
 
 static void no_lock(unsigned bucket)
@@ -17,12 +17,12 @@ static void no_unlock(unsigned bucket)
 	return;
 }
 
-static void no_teardown(void * locks, unsigned buckets)
+static void no_teardown(void)
 {
 	return;
 }
 
-static ln_test_t test_none = {
+ln_test_t test_none = {
 	.name = "No locks, singly threaded",
 	.min_threads = 1,
 	.max_threads = 1,
@@ -34,8 +34,3 @@ static ln_test_t test_none = {
 	.stats.writes = 0,
 };
 
-void ln_sims_register_all(void)
-{
-	ln_test_register(&test_none);
-	return;
-}

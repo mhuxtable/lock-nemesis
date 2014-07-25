@@ -9,13 +9,13 @@
 typedef struct ln_test_ops
 {
 	// set up the test; returns pointer to locks (array), or equivalent
-	void *(*setup)(unsigned);
+	void  (*setup)(unsigned);
 	// lock the data structure with lock number passed in
 	void  (*lock)(unsigned);
 	// unlock the data structure with lock number passed in
 	void  (*unlock)(unsigned);
 	// teardown afterwards
-	void (*teardown)(void *, unsigned);
+	void (*teardown)(void);
 } ln_test_ops_t;
 
 typedef struct ln_test_stats

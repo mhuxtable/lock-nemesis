@@ -246,7 +246,6 @@ static void free_hash_table(void)
 static int ln_test_run(ln_test_t *test, unsigned num_threads)
 {
 	int i;
-	void *locks;
 
 	ln_thread_t *threads = (ln_thread_t *) 
 		kzalloc(sizeof(ln_thread_t) * num_threads, GFP_KERNEL);
@@ -262,7 +261,7 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 	printk(KERN_ALERT "[Scaling Locks] Setting up for test %s with %u threads.\n",
 		test->name, num_threads);
 
-	locks = test->ops.setup((1 << HASH_TABLE_BITS));
+	test->ops.setup((1 << HASH_TABLE_BITS));
 
 	for (i = 0; i < num_threads; i++)
 	{
@@ -270,7 +269,6 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		snprintf(name, 20, "scalinglocks%d", (i+1));
 
 		threads[i].ops       = &test->ops;
-		threads[i].locks     = locks;
 
 		atomic_inc(&active_threads);
 		threads[i].thread = kthread_create((void *) test_thread, &threads[i], name);
@@ -294,7 +292,7 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 	/* Free every object we allocated on that run. */
 	free_hash_table();
 
-	test->ops.teardown(locks, 1 << HASH_TABLE_BITS);
+	test->ops.teardown();
 	
 	kfree(threads);
 
