@@ -78,7 +78,7 @@ int ln_test_run_all(void)
 	{
 		unsigned threads;
 		ln_test_t *test = tests[i];
-		for (threads = 1; threads <= test->max_threads; threads *= 2)
+		for (threads = test->min_threads; threads <= test->max_threads; threads *= 2)
 			ln_test_run(test, threads);
 
 		// TODO: collate statistics here

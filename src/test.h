@@ -33,7 +33,8 @@ typedef struct ln_test_stats
 typedef struct ln_test
 {
 	char           *name;
-	// The maximum number of threads this locking scheme should be tested with
+	// The bounded number of threads this locking scheme should be tested with
+	unsigned        min_threads;
 	unsigned        max_threads;
 	ln_test_ops_t   ops;
 	ln_test_stats_t stats;
