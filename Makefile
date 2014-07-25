@@ -9,8 +9,8 @@ $(KERNEL_OBJ)-objs += src/stat.o
 $(KERNEL_OBJ)-objs += src/test.o
 $(KERNEL_OBJ)-objs += src/sims.o
 	
-#KDIR=/lib/modules/$(shell uname -r)/build
-KDIR=/local/scratch/mjh233/qemu-linux/linux-3.13.1/
+KDIR=/lib/modules/$(shell uname -r)/build
+#KDIR=/local/scratch/mjh233/qemu-linux/linux-3.13.1/
 
 all: 
 	mkdir -p bin
