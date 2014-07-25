@@ -12,7 +12,7 @@
 #include <stat.h>
 #include <thread.h>
 
-#define HASH_TABLE_BITS		8
+#define HASH_TABLE_BITS		24
 #define MAX_NUM_OF_TESTS	8
 #define TEST_RUNTIME_SECS	30
 #define WRITE_FRACTION		26  // for each batch of 256, on average, by LLN
