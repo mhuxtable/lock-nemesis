@@ -5,6 +5,8 @@
 #include <linux/sched.h>
 #include <linux/seqlock.h>
 
+extern int write_fraction;
+
 // Indirection on test operations for setup, run and teardown
 typedef struct ln_test_ops
 {

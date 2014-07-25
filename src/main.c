@@ -13,6 +13,10 @@ extern int ln_test_run_all(void);
 extern ln_test_t test_none;
 extern ln_test_t test_spin;
 
+// for each batch of 256, on average, by LLN
+int    write_fraction = 26;
+module_param_named(writefrac, write_fraction, int, 0);
+
 void ln_sims_register_all(void)
 {
 	ln_test_register(&test_none);
@@ -23,6 +27,9 @@ void ln_sims_register_all(void)
 static int __init locking_init(void)
 {
 	printk(KERN_ALERT "[Scaling Locks] Starting up...\n");
+
+	printk(KERN_ALERT "[Scaling Locks] Write fraction configured as %d in 256\n",
+		write_fraction);
 
 	ln_sims_register_all();
 

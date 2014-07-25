@@ -15,7 +15,6 @@
 #define HASH_TABLE_BITS		24
 #define MAX_NUM_OF_TESTS	8
 #define TEST_RUNTIME_SECS	30
-#define WRITE_FRACTION		26  // for each batch of 256, on average, by LLN
 
 /* arrays of tests should only be accessed from the test management thread */
 static ln_test_t *tests[MAX_NUM_OF_TESTS];
@@ -108,7 +107,7 @@ static inline oper_t get_op(void)
 	int rnd;
 	get_random_bytes_arch(&rnd, sizeof(int));
 
-	if ((rnd & 0xFF) < WRITE_FRACTION)
+	if ((rnd & 0xFF) < write_fraction)
 		return op_write;
 	else
 		return op_read;
@@ -206,7 +205,7 @@ static int test_thread(void *data)
 		 * this to happen deterministically, i.e. always after a read or a write
 		 * operation. I'm piggybacking on the get_op() stuff now, a second time,
 		 * (i.e. decoupled from the above) and sleeping whenever the answer is
-		 * op_write. I'm also assuming the WRITE_FRACTION will be quite small,
+		 * op_write. I'm also assuming the write_fraction will be quite small,
 		 * and hence sleeping is not the common case through this code path.
 		 */
 		if (unlikely(get_op() == op_write))
