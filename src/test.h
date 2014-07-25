@@ -12,10 +12,14 @@ typedef struct ln_test_ops
 {
 	// set up the test; returns pointer to locks (array), or equivalent
 	void  (*setup)(unsigned);
-	// lock the data structure with lock number passed in
-	void  (*lock)(unsigned);
-	// unlock the data structure with lock number passed in
-	void  (*unlock)(unsigned);
+	// lock the data structure with lock number passed in (reading)
+	void  (*rlock)(unsigned);
+	// unlock the data structure with lock number passed in (reading)
+	void  (*runlock)(unsigned);
+	// lock the data structure with lock number passed in (writing)
+	void  (*wlock)(unsigned);
+	// unlock the data structure with lock number passed in (writing)
+	void  (*wunlock)(unsigned);
 	// teardown afterwards
 	void (*teardown)(void);
 } ln_test_ops_t;

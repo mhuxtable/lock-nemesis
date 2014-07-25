@@ -123,7 +123,7 @@ static inline void process_read(ln_thread_t *thread)
 	get_random_bytes_arch(&key, sizeof(u64));
 	key = ln_rnd_key_mask(key);
 	bucket = hash_min(key, HASH_TABLE_BITS);
-	thread->ops->lock(bucket);
+	thread->ops->rlock(bucket);
 	hash_for_each_possible(hashtable, e, hash, key)
 	{
 		if (e->key == key)
@@ -131,7 +131,7 @@ static inline void process_read(ln_thread_t *thread)
 			if (unlikely(e->val != ln_rnd_key_get_val(key)))
 				thread->stats.verify_corrupt++;
 
-			thread->ops->unlock(bucket);
+			thread->ops->runlock(bucket);
 			return;
 		}
 		else
@@ -139,7 +139,7 @@ static inline void process_read(ln_thread_t *thread)
 			continue;
 		}
 	}
-	thread->ops->unlock(bucket);
+	thread->ops->runlock(bucket);
 
 	thread->stats.verify_miss++;
 	return;
@@ -162,9 +162,9 @@ static inline void process_write(ln_thread_t *thread)
 
 	bucket = hash_min(e->key, HASH_TABLE_BITS);
 	
-	thread->ops->lock(bucket);
+	thread->ops->wlock(bucket);
 	hash_add(hashtable, &e->hash, e->key);
-	thread->ops->unlock(bucket);
+	thread->ops->wunlock(bucket);
 
 	return;
 }
