@@ -129,16 +129,11 @@ static inline void process_read(ln_thread_t *thread)
 	{
 		if (e->key == key)
 		{
-			if (likely(e->val == ln_rnd_key_get_val(key)))
-			{
-				// Successful match
-				return;
-			}
-			else
-			{
+			if (unlikely(e->val != ln_rnd_key_get_val(key)))
 				thread->stats.verify_corrupt++;
-				return;
-			}
+
+			thread->ops->unlock(bucket);
+			return;
 		}
 		else
 		{
