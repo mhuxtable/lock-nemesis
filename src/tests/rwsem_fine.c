@@ -51,6 +51,7 @@ static void ln_rwsem_teardown(void)
 
 ln_test_t test_rwsem_fine = {
 	.name = "Read-write semaphore, fine-grained",
+	.shortname = "rwsem-fine",
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_rwsem_setup,

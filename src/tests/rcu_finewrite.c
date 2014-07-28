@@ -54,6 +54,7 @@ static void ln_rcu_teardown(void)
 
 ln_test_t test_rcu_finewrite = {
 	.name = "RCU, fine-grained writes",
+	.shortname = "RCU",
 	.min_threads = 1,
 	.max_threads = 8,
 	.ops.setup = ln_rcu_setup,
