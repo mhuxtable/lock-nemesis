@@ -13,6 +13,7 @@ extern int ln_test_run_all(void);
 extern ln_test_t test_none;
 extern ln_test_t test_spin_fine;
 extern ln_test_t test_spin_coarse;
+extern ln_test_t test_rcu_finewrite;
 extern ln_test_t test_rwsem_fine;
 extern ln_test_t test_rwsem_coarse;
 
@@ -25,6 +26,7 @@ void ln_sims_register_all(void)
 	ln_test_register(&test_none);
 	ln_test_register(&test_spin_fine);
 	ln_test_register(&test_spin_coarse);
+	ln_test_register(&test_rcu_finewrite);
 	ln_test_register(&test_rwsem_fine);
 	ln_test_register(&test_rwsem_coarse);
 	return;

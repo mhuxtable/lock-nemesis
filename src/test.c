@@ -124,7 +124,7 @@ static inline void process_read(ln_thread_t *thread)
 	key = ln_rnd_key_mask(key);
 	bucket = hash_min(key, HASH_TABLE_BITS);
 	thread->ops->rlock(bucket);
-	hash_for_each_possible(hashtable, e, hash, key)
+	hash_for_each_possible_rcu(hashtable, e, hash, key)
 	{
 		if (e->key == key)
 		{
@@ -163,7 +163,7 @@ static inline void process_write(ln_thread_t *thread)
 	bucket = hash_min(e->key, HASH_TABLE_BITS);
 	
 	thread->ops->wlock(bucket);
-	hash_add(hashtable, &e->hash, e->key);
+	hash_add_rcu(hashtable, &e->hash, e->key);
 	thread->ops->wunlock(bucket);
 
 	return;
@@ -233,7 +233,7 @@ static void free_hash_table(void)
 {
 	int bkt;
 	ln_hash_entry_t *e;
-	hash_for_each(hashtable, bkt, e, hash)
+	hash_for_each_rcu(hashtable, bkt, e, hash)
 	{
 		if (likely(e))
 			hash_del(&e->hash);
