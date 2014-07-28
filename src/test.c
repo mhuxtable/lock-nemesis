@@ -77,7 +77,7 @@ int ln_test_run_all(void)
 	for (i = 0; i < tests_count; i++)
 	{
 		unsigned threads;
-		int last_thread_count;
+		int last_thread_count = 0;
 		ln_test_t *test = tests[i];
 		for (threads = test->min_threads; threads <= test->max_threads; threads *= 2)
 		{
