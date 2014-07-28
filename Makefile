@@ -3,6 +3,10 @@ KERNEL_OBJ = bin/locktest
 obj-m = $(KERNEL_OBJ).o
 EXTRA_CFLAGS += -I$(PWD)/src 
 
+# Enable below only if a hardware RNG is available on the machine.
+# Performance will SUCK (!!!) otherwise.
+#EXTRA_CFLAGS += -DLN_USE_HW_RNG 
+
 $(KERNEL_OBJ)-objs += src/main.o
 $(KERNEL_OBJ)-objs += src/rnd.o
 $(KERNEL_OBJ)-objs += src/stat.o

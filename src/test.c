@@ -15,6 +15,7 @@
 #define HASH_TABLE_BITS		24
 #define MAX_NUM_OF_TESTS	8
 #define TEST_RUNTIME_SECS	30
+#define KEYLIST_SIZE		1
 
 /* arrays of tests should only be accessed from the test management thread */
 static ln_test_t *tests[MAX_NUM_OF_TESTS];
@@ -23,6 +24,25 @@ static unsigned   tests_count = 0;
 static int ln_test_run(ln_test_t *test, unsigned num_threads);
 
 static DECLARE_HASHTABLE(hashtable, HASH_TABLE_BITS);
+
+#ifndef LN_USE_HW_RNG
+char *ln_rnd_keylist = NULL;
+u64 *cur_key_off = 0;
+
+void ln_rnd_gen_keylist(size_t sz)
+{
+	u64 bytes = sz * 1024 * 1024;
+
+	if (sz > 4 || sz < 0)
+		sz = 4;
+	
+	ln_rnd_keylist = (char *) krealloc(ln_rnd, bytes, GFP_KERNEL);
+
+	if (unlikely(ksize(ln_rnd) < bytes))
+		bytes = ksize(ln_rnd);
+	get_random_bytes_arch((char *) ln_rnd_keylist, bytes);
+}
+#endif
 
 int ln_test_register(ln_test_t *test)
 {
@@ -48,6 +68,7 @@ int ln_test_register(ln_test_t *test)
 static int test_set_up(void)
 {
 	ln_rnd_seed(LN_RND_SIZE_DEFAULT);
+	ln_rnd_gen_keylist(KEYLIST_SIZE);
 	return 1;
 }
 
@@ -113,10 +134,14 @@ typedef struct ln_hash_entry
 	struct hlist_node hash;
 } ln_hash_entry_t;
 
-static inline oper_t get_op(void)
+static inline oper_t get_op(ln_thread_t *thread)
 {
 	int rnd;
+#ifdef LN_USE_HW_RNG
 	get_random_bytes_arch(&rnd, sizeof(int));
+#else
+	rnd = ln_rnd_keylist[cur_key_off[thread->id]];
+#endif
 
 	if ((rnd & 0xFF) < write_fraction)
 		return op_write;
@@ -131,7 +156,15 @@ static inline void process_read(ln_thread_t *thread)
 	ln_hash_entry_t *e;
 	u64 bucket;
 
+#ifdef LN_USE_HW_RNG
 	get_random_bytes_arch(&key, sizeof(u64));
+#else
+	memcpy(&key, ln_rnd_keylist + cur_key_off[thread->id], sizeof(u64));
+	if (cur_key_off[thread->id] + sizeof(u64) >= KEYLIST_SIZE * 1024 * 1024)
+		cur_key_off[thread->id] = thread->id;  // XXX(malte): hack -- set init offset in bytes to thread ID
+	else
+		cur_key_off[thread->id] += sizeof(u64);
+#endif
 	key = ln_rnd_key_mask(key);
 	bucket = hash_min(key, HASH_TABLE_BITS);
 	thread->ops->rlock(bucket);
@@ -167,7 +200,15 @@ static inline void process_write(ln_thread_t *thread)
 		return;
 	}
 
+#ifdef LN_USE_HW_RNG
 	get_random_bytes_arch(&e->key, sizeof(u64));
+#else
+	memcpy(&e->key, ln_rnd_keylist + cur_key_off[thread->id], sizeof(u64));
+	if (cur_key_off[thread->id] + sizeof(u64) >= KEYLIST_SIZE * 1024 * 1024)
+		cur_key_off[thread->id] = thread->id;  // XXX(malte): hack -- set init offset in bytes to thread ID
+	else
+		cur_key_off[thread->id] += sizeof(u64);
+#endif
 	e->key = ln_rnd_key_mask(e->key);
 	e->val = ln_rnd_key_get_val(e->key);
 
@@ -199,7 +240,7 @@ static int test_thread(void *data)
 		/* What type of operation is this?
 		 * Get some randomness and decide if it's a read/write depending on how
 		 * the random number turns out. */
-		oper_t op = get_op();
+		oper_t op = get_op(thread);
 
 		switch (op)
 		{
@@ -220,7 +261,7 @@ static int test_thread(void *data)
 		 * op_write. I'm also assuming the write_fraction will be quite small,
 		 * and hence sleeping is not the common case through this code path.
 		 */
-		if (unlikely(get_op() == op_write))
+		if (unlikely(get_op(thread) == op_write))
 			schedule();
 
 		continue;
@@ -261,6 +302,9 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 
 	ln_thread_t *threads = (ln_thread_t *) 
 		kzalloc(sizeof(ln_thread_t) * num_threads, GFP_KERNEL);
+#ifndef LN_USE_HW_RNG
+	cur_key_off = (u64*)kzalloc(sizeof(u64) * num_threads, GFP_KERNEL);
+#endif
 	if (unlikely(ksize(threads) < sizeof(ln_thread_t) * num_threads))
 	{
 		printk(KERN_ALERT "[Scaling Locks] Did not get full allocation for ln_thread_t. "
@@ -287,6 +331,10 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 
 		atomic_inc(&active_threads);
 		threads[i].thread = kthread_create((void *) test_thread, &threads[i], name);
+		threads[i].id = i;
+#ifndef LN_USE_HW_RNG
+		cur_key_off[i] = i;
+#endif
 		if (IS_ERR_OR_NULL(threads[i].thread))
 		{
 			atomic_dec(&active_threads);

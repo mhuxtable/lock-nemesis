@@ -9,6 +9,7 @@ typedef struct ln_thread
 	char               *threadname;
 	ln_test_stats_t     stats;
 	ln_test_ops_t      *ops;
+	u64		   id;
 } ln_thread_t;
 
 #endif // LN_THREAD_H
