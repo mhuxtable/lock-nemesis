@@ -2,6 +2,22 @@
 #include <stat.h>
 #include <test.h>
 
+void ln_stats_print_header(void)
+{
+	printk(KERN_ALERT
+		"Name\t"
+		"Time\t"
+		"Threads\t"
+		"Reads\t"
+		"Writes\t"
+		"TotalOps\t"
+		"VerMiss\t"
+		"VerCorr\t"
+		"OpsPerSec\n"
+	);
+	return;
+}
+
 void thread_print_stats(ln_test_t *test, ln_test_stats_t *stats, int num_threads)
 {
 	int ops_total = stats->reads + stats->writes;

@@ -65,6 +65,7 @@ int ln_test_run_all(void)
 	 * implementation.
 	 */
 	unsigned i;
+	ln_stats_print_header();
 
 	if (unlikely(!test_set_up()))
 	{
