@@ -80,6 +80,10 @@ int ln_test_run_all(void)
 		ln_test_t *test = tests[i];
 		for (threads = test->min_threads; threads <= test->max_threads; threads *= 2)
 			ln_test_run(test, threads);
+		/* make sure we catch the max_threads, if it doesn't happen to be a
+		   multiple of 2 */
+		if (threads != test->max_threads)
+			ln_test_run(test, test->max_threads);
 
 		// TODO: collate statistics here
 	}
