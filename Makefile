@@ -14,6 +14,7 @@ $(KERNEL_OBJ)-objs += src/tests/spin_coarse.o
 $(KERNEL_OBJ)-objs += src/tests/rcu_finewrite.o
 $(KERNEL_OBJ)-objs += src/tests/rwsem_fine.o
 $(KERNEL_OBJ)-objs += src/tests/rwsem_coarse.o
+$(KERNEL_OBJ)-objs += src/tests/rwlock_fine.o
 	
 KDIR=/lib/modules/$(shell uname -r)/build
 #KDIR=/local/scratch/mjh233/qemu-linux/linux-3.13.1/
