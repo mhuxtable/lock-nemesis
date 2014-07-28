@@ -184,8 +184,7 @@ static int test_thread(void *data)
 		thread->threadname, TEST_RUNTIME_SECS);
 #endif
 
-	while (jiffies_to_msecs(get_jiffies_64() - thread->stats.starttime) 
-		< (TEST_RUNTIME_SECS * 1000))
+	while (!kthread_should_stop())
 	{
 		/* What type of operation is this?
 		 * Get some randomness and decide if it's a read/write depending on how
@@ -288,7 +287,21 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		wake_up_process(threads[i].thread);
 	}
 
-	/* Now wait for all the threads to quit */
+	/* Figure out when to stop the threads after 30 seconds have elapsed */
+	while (jiffies_to_msecs(get_jiffies_64() - stats.starttime)
+		< (TEST_RUNTIME_SECS * 1000))
+	{
+		/* Go to sleep */
+		set_current_state(TASK_INTERRUPTIBLE);
+		schedule_timeout(HZ);
+		continue;
+	}
+	stats.endtime = get_jiffies_64();
+	/* Signal all threads to quit it */
+	for (i = 0; i < num_threads; i++)
+		kthread_stop(threads[i].thread);
+
+	/* Now wait for all the threads to actually quit */
 	wait_event_interruptible(thread_wq, atomic_read(&active_threads) == 0);
 
 #ifdef DEBUG

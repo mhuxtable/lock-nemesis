@@ -25,12 +25,13 @@ void thread_print_stats(ln_test_t *test, ln_test_stats_t *stats, int num_threads
 
 	printk(KERN_ALERT "%s\t%llu\t%d\t%d\t%d\t%d\t%d\t%d\t%llu\n",
 		test->shortname,
-		(long long unsigned int)0,
+		runtime,
 		num_threads,
 		stats->reads, stats->writes, ops_total,
 		stats->verify_miss,
 		stats->verify_corrupt,
-		(long long unsigned int)0);
+		(ops_total / runtime)
+	);
 }
 
 void ln_stats_collate_threads(ln_thread_t *threads, int num_threads,
