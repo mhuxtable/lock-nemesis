@@ -178,8 +178,10 @@ static int test_thread(void *data)
 	   plus 30 seconds from now. */
 	thread->stats.starttime = get_jiffies_64();
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] [%s] Embarking on a %u second test.\n",
 		thread->threadname, TEST_RUNTIME_SECS);
+#endif
 
 	while (jiffies_to_msecs(get_jiffies_64() - thread->stats.starttime) 
 		< (TEST_RUNTIME_SECS * 1000))
@@ -216,8 +218,10 @@ static int test_thread(void *data)
 
 	thread->stats.endtime = get_jiffies_64();
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] [%s] 30 seconds elapsed, done.\n", 
 		thread->threadname);
+#endif
 
 	thread_print_stats(thread);
 
@@ -257,8 +261,10 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		return -1;
 	}
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] Setting up for test %s with %u threads.\n",
 		test->name, num_threads);
+#endif
 
 	test->ops.setup((1 << HASH_TABLE_BITS));
 
@@ -285,8 +291,10 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 	/* Now wait for all the threads to quit */
 	wait_event_interruptible(thread_wq, atomic_read(&active_threads) == 0);
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] Completed test %s. %u threads terminated.\n",
 		test->name, i);
+#endif
 
 	/* Free every object we allocated on that run. */
 	free_hash_table();
