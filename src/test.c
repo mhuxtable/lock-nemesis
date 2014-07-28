@@ -287,6 +287,7 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		wake_up_process(threads[i].thread);
 	}
 
+	stats.starttime = get_jiffies_64();
 	/* Figure out when to stop the threads after 30 seconds have elapsed */
 	while (jiffies_to_msecs(get_jiffies_64() - stats.starttime)
 		< (TEST_RUNTIME_SECS * 1000))
