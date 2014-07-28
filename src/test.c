@@ -223,8 +223,6 @@ static int test_thread(void *data)
 		thread->threadname);
 #endif
 
-	thread_print_stats(thread);
-
 	atomic_dec(&active_threads);
 	wake_up_all(&thread_wq);
 
@@ -249,6 +247,7 @@ static void free_hash_table(void)
 static int ln_test_run(ln_test_t *test, unsigned num_threads)
 {
 	int i;
+	ln_test_stats_t stats;	// place for overall stats to be collated
 
 	ln_thread_t *threads = (ln_thread_t *) 
 		kzalloc(sizeof(ln_thread_t) * num_threads, GFP_KERNEL);
@@ -301,6 +300,10 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 
 	test->ops.teardown();
 	
+	/* Gather statistics and print to console. */
+	ln_stats_collate_threads(threads, num_threads, &stats);
+	thread_print_stats(test, &stats, num_threads);
+
 	kfree(threads);
 
 	return 0;
