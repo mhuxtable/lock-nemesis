@@ -23,7 +23,7 @@ void thread_print_stats(ln_test_t *test, ln_test_stats_t *stats, int num_threads
 	int ops_total = stats->reads + stats->writes;
 	u64 runtime   = (stats->endtime - stats->starttime) / HZ;
 
-	printk("%s\t%llu\t%d\t%d\t%d\t%d\t%d\t%d\t%llu\n",
+	printk(KERN_ALERT "%s\t%llu\t%d\t%d\t%d\t%d\t%d\t%d\t%llu\n",
 		test->shortname,
 		(long long unsigned int)0,
 		num_threads,
