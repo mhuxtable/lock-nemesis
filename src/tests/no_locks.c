@@ -34,6 +34,7 @@ static void no_teardown(void)
 
 ln_test_t test_none = {
 	.name = "No locks, singly threaded",
+	.shortname = "nolock",
 	.min_threads = 1,
 	.max_threads = 1,
 	.ops.setup = no_setup,

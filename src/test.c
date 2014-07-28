@@ -65,6 +65,7 @@ int ln_test_run_all(void)
 	 * implementation.
 	 */
 	unsigned i;
+	ln_stats_print_header();
 
 	if (unlikely(!test_set_up()))
 	{
@@ -178,11 +179,12 @@ static int test_thread(void *data)
 	   plus 30 seconds from now. */
 	thread->stats.starttime = get_jiffies_64();
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] [%s] Embarking on a %u second test.\n",
 		thread->threadname, TEST_RUNTIME_SECS);
+#endif
 
-	while (jiffies_to_msecs(get_jiffies_64() - thread->stats.starttime) 
-		< (TEST_RUNTIME_SECS * 1000))
+	while (!kthread_should_stop())
 	{
 		/* What type of operation is this?
 		 * Get some randomness and decide if it's a read/write depending on how
@@ -216,10 +218,10 @@ static int test_thread(void *data)
 
 	thread->stats.endtime = get_jiffies_64();
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] [%s] 30 seconds elapsed, done.\n", 
 		thread->threadname);
-
-	thread_print_stats(thread);
+#endif
 
 	atomic_dec(&active_threads);
 	wake_up_all(&thread_wq);
@@ -245,6 +247,7 @@ static void free_hash_table(void)
 static int ln_test_run(ln_test_t *test, unsigned num_threads)
 {
 	int i;
+	ln_test_stats_t stats;	// place for overall stats to be collated
 
 	ln_thread_t *threads = (ln_thread_t *) 
 		kzalloc(sizeof(ln_thread_t) * num_threads, GFP_KERNEL);
@@ -257,8 +260,11 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		return -1;
 	}
 
+	memset(&stats, 0, sizeof(ln_test_stats_t));
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] Setting up for test %s with %u threads.\n",
 		test->name, num_threads);
+#endif
 
 	test->ops.setup((1 << HASH_TABLE_BITS));
 
@@ -282,17 +288,38 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		wake_up_process(threads[i].thread);
 	}
 
-	/* Now wait for all the threads to quit */
+	stats.starttime = get_jiffies_64();
+	/* Figure out when to stop the threads after 30 seconds have elapsed */
+	while (jiffies_to_msecs(get_jiffies_64() - stats.starttime)
+		< (TEST_RUNTIME_SECS * 1000))
+	{
+		/* Go to sleep */
+		set_current_state(TASK_INTERRUPTIBLE);
+		schedule_timeout(HZ);
+		continue;
+	}
+	stats.endtime = get_jiffies_64();
+	/* Signal all threads to quit it */
+	for (i = 0; i < num_threads; i++)
+		kthread_stop(threads[i].thread);
+
+	/* Now wait for all the threads to actually quit */
 	wait_event_interruptible(thread_wq, atomic_read(&active_threads) == 0);
 
+#ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] Completed test %s. %u threads terminated.\n",
 		test->name, i);
+#endif
 
 	/* Free every object we allocated on that run. */
 	free_hash_table();
 
 	test->ops.teardown();
 	
+	/* Gather statistics and print to console. */
+	ln_stats_collate_threads(threads, num_threads, &stats);
+	thread_print_stats(test, &stats, num_threads);
+
 	kfree(threads);
 
 	return 0;

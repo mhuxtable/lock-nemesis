@@ -30,8 +30,9 @@ static void ln_spin_teardown(void)
 
 ln_test_t test_spin_coarse = {
 	.name = "Spinlock, coarse-grained",
+	.shortname = "spin-coarse",
 	.min_threads = 1,
-	.max_threads = 8,
+	.max_threads = 12,
 	.ops.setup = ln_spin_setup,
 	.ops.rlock  = ln_spin_lock,
 	.ops.runlock = ln_spin_unlock,

@@ -42,6 +42,7 @@ static void ln_rwsem_teardown(void)
 
 ln_test_t test_rwsem_coarse = {
 	.name = "Read-write semaphore, coarse-grained",
+	.shortname = "rwsem-coarse",
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_rwsem_setup,

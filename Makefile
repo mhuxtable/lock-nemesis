@@ -19,6 +19,9 @@ $(KERNEL_OBJ)-objs += src/tests/rwlock_fine.o
 KDIR=/lib/modules/$(shell uname -r)/build
 #KDIR=/local/scratch/mjh233/qemu-linux/linux-3.13.1/
 
+include $(PWD)/Lock.makeopts
+EXTRA_CFLAGS += $(LN_OPTS)
+
 all: 
 	mkdir -p bin
 	make -C $(KDIR) M=$(PWD) modules
