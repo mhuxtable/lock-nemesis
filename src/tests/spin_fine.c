@@ -37,10 +37,10 @@ static void ln_spin_teardown(void)
 	return;
 }
 
-ln_test_t test_spin = {
-	.name = "Spinlock, singly threaded",
+ln_test_t test_spin_fine = {
+	.name = "Spinlock, fine-grained",
 	.min_threads = 1,
-	.max_threads = 1,
+	.max_threads = 8,
 	.ops.setup = ln_spin_setup,
 	.ops.rlock  = ln_spin_lock,
 	.ops.runlock = ln_spin_unlock,
