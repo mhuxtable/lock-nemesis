@@ -37,8 +37,10 @@ void ln_rnd_seed(size_t sz)
 	 * outside. */
 	item_mask = (bytes / sizeof(u64)) - 1;
 
+#ifdef DEBUG
 	printk(KERN_ALERT "Allocated %zu bytes (%zu internally).\n", 
 		ksize(ln_rnd), bytes);
+#endif
 }
 
 u64 ln_rnd_key_get_val(u64 key)
