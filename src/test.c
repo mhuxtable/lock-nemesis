@@ -77,12 +77,18 @@ int ln_test_run_all(void)
 	for (i = 0; i < tests_count; i++)
 	{
 		unsigned threads;
+		int last_thread_count;
 		ln_test_t *test = tests[i];
 		for (threads = test->min_threads; threads <= test->max_threads; threads *= 2)
+		{
+			last_thread_count = threads;
 			ln_test_run(test, threads);
+		}
 		/* make sure we catch the max_threads, if it doesn't happen to be a
-		   multiple of 2 */
-		if (threads != test->max_threads)
+		   multiple of 2. Can't reuse the "threads" variable here since the last
+		   invocation of the for loop will change its value, so need to track based
+		   on the counter within the loop added for this purpose. */
+		if (last_thread_count < test->max_threads)
 			ln_test_run(test, test->max_threads);
 
 		// TODO: collate statistics here
