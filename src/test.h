@@ -21,7 +21,7 @@ typedef struct ln_test_ops
 	// unlock the data structure with lock number passed in (writing)
 	void  (*wunlock)(unsigned);
 	// teardown afterwards
-	void (*teardown)(void);
+	void (*teardown)(unsigned);
 } ln_test_ops_t;
 
 typedef struct ln_test_stats

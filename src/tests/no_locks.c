@@ -27,7 +27,7 @@ static void no_write_unlock(unsigned bucket)
 	return;
 }
 
-static void no_teardown(void)
+static void no_teardown(unsigned buckets)
 {
 	return;
 }

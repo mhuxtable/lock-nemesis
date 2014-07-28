@@ -314,7 +314,7 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 	/* Free every object we allocated on that run. */
 	free_hash_table();
 
-	test->ops.teardown();
+	test->ops.teardown((1 << HASH_TABLE_BITS));
 	
 	/* Gather statistics and print to console. */
 	ln_stats_collate_threads(threads, num_threads, &stats);

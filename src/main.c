@@ -17,6 +17,7 @@ extern ln_test_t test_rcu_finewrite;
 extern ln_test_t test_rwsem_fine;
 extern ln_test_t test_rwsem_coarse;
 extern ln_test_t test_rwlock_fine;
+//extern ln_test_t test_percpu_rwsem_fine;
 
 // for each batch of 256, on average, by LLN
 int    write_fraction = 26;
@@ -31,6 +32,7 @@ void ln_sims_register_all(void)
 	ln_test_register(&test_rwsem_fine);
 	ln_test_register(&test_rwsem_coarse);
 	ln_test_register(&test_rwlock_fine);
+	//ln_test_register(&test_percpu_rwsem_fine);
 	return;
 }
 

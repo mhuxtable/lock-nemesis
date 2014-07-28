@@ -41,7 +41,7 @@ static void ln_rwsem_wunlock(unsigned bucket)
 	return;
 }
 
-static void ln_rwsem_teardown(void)
+static void ln_rwsem_teardown(unsigned buckets)
 {
 	vfree(locks);
 	locks = NULL;

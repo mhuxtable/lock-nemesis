@@ -41,7 +41,7 @@ static void ln_write_unlock(unsigned bucket)
 	return;
 }
 
-static void ln_spin_teardown(void)
+static void ln_spin_teardown(unsigned buckets)
 {
 	vfree(locks);
 	locks = NULL;

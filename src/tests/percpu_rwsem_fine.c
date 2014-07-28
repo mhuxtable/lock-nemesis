@@ -1,48 +1,60 @@
 
-#include <linux/rwsem.h>
+#include <linux/percpu-rwsem.h>
 #include <linux/vmalloc.h>
 
 #include <test.h>
 
-static DECLARE_RWSEM(semaphore_lock);
+static struct percpu_rw_semaphore *locks = NULL;
 
 static void ln_rwsem_setup(unsigned buckets)
 {
-	return;
+  int lock;
+  locks = (struct percpu_rw_semaphore *) vmalloc(sizeof(struct percpu_rw_semaphore) * buckets);
+
+  for (lock = 0; lock < buckets; lock++)
+    percpu_init_rwsem(&locks[lock]);
+
+  return;
 }
 
 static void ln_rwsem_rlock(unsigned bucket)
 {
-	down_read(&semaphore_lock);
+	percpu_down_read(&locks[bucket]);
 	return;
 }
 
 static void ln_rwsem_runlock(unsigned bucket)
 {
-	up_read(&semaphore_lock);
+	percpu_up_read(&locks[bucket]);
 	return;
 }
 
 static void ln_rwsem_wlock(unsigned bucket)
 {
-	down_write(&semaphore_lock);
+	percpu_down_write(&locks[bucket]);
 	return;
 }
 
 static void ln_rwsem_wunlock(unsigned bucket)
 {
-	up_write(&semaphore_lock);
+	percpu_up_write(&locks[bucket]);
 	return;
 }
 
 static void ln_rwsem_teardown(unsigned buckets)
 {
+  int lock;
+
+  for (lock = 0; lock < buckets; lock++)
+    percpu_free_rwsem(&locks[lock]);
+	locks = NULL;
+
 	return;
 }
 
-ln_test_t test_rwsem_coarse = {
-	.name = "Read-write semaphore, coarse-grained",
-	.shortname = "rwsem-coarse",
+ln_test_t test_percpu_rwsem_fine = {
+	.name = "Per-CPU read-write semaphore, fine-grained",
+	.shortname = "percpurwsem-fine",
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_rwsem_setup,

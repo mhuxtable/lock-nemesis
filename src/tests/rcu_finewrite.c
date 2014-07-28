@@ -44,7 +44,7 @@ static void ln_rcu_wunlock(unsigned bucket)
 	return;
 }
 
-static void ln_rcu_teardown(void)
+static void ln_rcu_teardown(unsigned buckets)
 {
 	vfree(locks);
 	locks = NULL;
