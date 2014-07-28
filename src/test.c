@@ -260,6 +260,7 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 		return -1;
 	}
 
+	memset(&stats, 0, sizeof(ln_test_stats_t));
 #ifdef DEBUG
 	printk(KERN_ALERT "[Scaling Locks] Setting up for test %s with %u threads.\n",
 		test->name, num_threads);
