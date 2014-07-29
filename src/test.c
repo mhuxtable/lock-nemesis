@@ -378,6 +378,11 @@ static int ln_test_run(ln_test_t *test, unsigned num_threads)
 	ln_stats_collate_threads(threads, num_threads, &stats);
 	thread_print_stats(test, &stats, num_threads);
 
+#ifndef LN_USE_HW_RNG
+  kfree(cur_key_off);
+  kfree(ln_rnd_keylist);
+#endif
+
 	kfree(threads);
 
 	return 0;
