@@ -94,6 +94,8 @@ int ln_test_run_all(void)
 		// TODO: collate statistics here
 	}
 
+	kfree(ln_rnd);
+
 	return 1;
 }
 
@@ -245,12 +247,17 @@ static void free_hash_table(void)
 {
 	int bkt;
 	ln_hash_entry_t *e;
+	int i = 0;
 	hash_for_each_rcu(hashtable, bkt, e, hash)
 	{
 		if (likely(e))
+		{
+			i++;
 			hash_del(&e->hash);
 			kfree(e);
+		}
 	}
+	printk(KERN_ALERT "[Scaling Locks] Freed %d ln_hash_entry_t instances.\n", i);
 	return;
 }
 
