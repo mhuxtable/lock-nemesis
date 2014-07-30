@@ -43,10 +43,10 @@ static void ln_rwsem_wunlock(unsigned bucket)
 
 static void ln_rwsem_teardown(unsigned buckets)
 {
-  int lock;
+	int lock;
 
-  for (lock = 0; lock < buckets; lock++)
-    percpu_free_rwsem(&locks[lock]);
+	for (lock = 0; lock < buckets; lock++)
+		percpu_free_rwsem(&locks[lock]);
 	locks = NULL;
 
 	return;
