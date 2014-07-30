@@ -14,7 +14,7 @@
 
 #define HASH_TABLE_BITS		24
 #define MAX_NUM_OF_TESTS	8
-#define TEST_RUNTIME_SECS	30
+#define TEST_RUNTIME_SECS	3
 
 /* arrays of tests should only be accessed from the test management thread */
 static ln_test_t *tests[MAX_NUM_OF_TESTS];
@@ -177,6 +177,18 @@ static inline void process_write(ln_thread_t *thread)
 	
 	thread->ops->wlock(bucket);
 	hash_add_rcu(hashtable, &e->hash, e->key);
+	// Actually there?
+	u64 key = e->key;
+	hash_for_each_possible_rcu(hashtable, e, hash, key)
+	{
+	//	printk(KERN_ALERT "Looking for key %lu, got %lu", key, e->key);
+		if (key == e->key)
+		{
+			goto out;
+		}
+	}
+	printk("Did not find key %lu", key);
+out:
 	thread->ops->wunlock(bucket);
 
 	return;
@@ -248,14 +260,14 @@ static void free_hash_table(void)
 	int bkt;
 	ln_hash_entry_t *e;
 	int i = 0;
-	hash_for_each_rcu(hashtable, bkt, e, hash)
+	hash_for_each(hashtable, bkt, e, hash)
 	{
-		if (likely(e))
-		{
+//		if (likely(e))
+//		{
 			i++;
 			hash_del(&e->hash);
 			kfree(e);
-		}
+//		}
 	}
 	printk(KERN_ALERT "[Scaling Locks] Freed %d ln_hash_entry_t instances.\n", i);
 	return;
