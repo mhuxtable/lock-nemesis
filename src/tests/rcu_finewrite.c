@@ -20,10 +20,20 @@ static void ln_rcu_setup(unsigned buckets)
 	return;
 }
 
-static void *ln_rcu_rlock(unsigned bucket)
+static void *no_thread_setup(unsigned buckets)
+{
+	return NULL;
+}
+
+static void no_thread_teardown(void *data)
+{
+	return;
+}
+
+static void ln_rcu_rlock(unsigned bucket, void *lockdata)
 {
 	rcu_read_lock();
-	return NULL;
+	return;
 }
 
 static void ln_rcu_runlock(unsigned bucket, void *data)
@@ -32,10 +42,10 @@ static void ln_rcu_runlock(unsigned bucket, void *data)
 	return;
 }
 
-static void *ln_rcu_wlock(unsigned bucket)
+static void ln_rcu_wlock(unsigned bucket, void *lockdata)
 {
 	spin_lock(&locks[bucket]);
-	return NULL;
+	return;
 }
 
 static void ln_rcu_wunlock(unsigned bucket, void *data)
@@ -58,6 +68,8 @@ ln_test_t test_rcu_finewrite = {
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_rcu_setup,
+	.ops.threadsetup = no_thread_setup,
+	.ops.threadteardown = no_thread_teardown,
 	.ops.rlock  = ln_rcu_rlock,
 	.ops.runlock = ln_rcu_runlock,
 	.ops.wlock = ln_rcu_wlock,

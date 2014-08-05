@@ -11,10 +11,20 @@ static void ln_spin_setup(unsigned buckets)
 	return;
 }
 
-static void *ln_spin_lock(unsigned bucket)
+static void *no_thread_setup(unsigned buckets)
+{
+	return NULL;
+}
+
+static void no_thread_teardown(void *data)
+{
+	return;
+}
+
+static void ln_spin_lock(unsigned bucket, void *lockdata)
 {
 	spin_lock(&spinlock_lock);
-	return NULL;
+	return;
 }
 
 static void ln_spin_unlock(unsigned bucket, void *data)
@@ -34,6 +44,8 @@ ln_test_t test_spin_coarse = {
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_spin_setup,
+	.ops.threadsetup = no_thread_setup,
+	.ops.threadteardown = no_thread_teardown,
 	.ops.rlock  = ln_spin_lock,
 	.ops.runlock = ln_spin_unlock,
 	.ops.wlock = ln_spin_lock,
