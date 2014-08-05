@@ -8,6 +8,7 @@ $(KERNEL_OBJ)-objs += src/rnd.o
 $(KERNEL_OBJ)-objs += src/stat.o
 $(KERNEL_OBJ)-objs += src/test.o
 
+$(KERNEL_OBJ)-objs += src/tests/mcs_fine.o
 $(KERNEL_OBJ)-objs += src/tests/no_locks.o
 $(KERNEL_OBJ)-objs += src/tests/spin_fine.o
 $(KERNEL_OBJ)-objs += src/tests/spin_coarse.o
