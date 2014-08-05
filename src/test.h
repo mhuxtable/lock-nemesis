@@ -12,14 +12,27 @@ typedef struct ln_test_ops
 {
 	// set up the test; returns pointer to locks (array), or equivalent
 	void  (*setup)(unsigned);
+	/* The void * pointer returned by a locking operation and the
+	   corresponding void * argument to unlock operations are for
+	   passing arbitrary data to and from the lock/unlock operations.
+	   This was added specially for the MCS locks,
+	   and in most instances where an explicit exchange of data is not
+	   necessary, it is quite in order to set the return pointer to NULL
+	   and pass NULL back to the unlock function.
+
+	   External consumers of this interface should not do any operation
+	   on the pointer other than store it and pass it back for unlock.
+	   This is because they cannot possibly know what the pointer
+	   actually is, as it is related to the internals of the locktest
+	   specification which is hidden. */
 	// lock the data structure with lock number passed in (reading)
-	void  (*rlock)(unsigned);
+	void *(*rlock)(unsigned);
 	// unlock the data structure with lock number passed in (reading)
-	void  (*runlock)(unsigned);
+	void  (*runlock)(unsigned, void *);
 	// lock the data structure with lock number passed in (writing)
-	void  (*wlock)(unsigned);
+	void *(*wlock)(unsigned);
 	// unlock the data structure with lock number passed in (writing)
-	void  (*wunlock)(unsigned);
+	void  (*wunlock)(unsigned, void *);
 	// teardown afterwards
 	void (*teardown)(unsigned);
 } ln_test_ops_t;

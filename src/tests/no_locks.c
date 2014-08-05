@@ -7,22 +7,22 @@ static void no_setup(unsigned buckets)
 	return;
 }
 
-static void no_read_lock(unsigned bucket)
+static void *no_read_lock(unsigned bucket)
+{
+	return NULL;
+}
+
+static void no_read_unlock(unsigned bucket, void *data)
 {
 	return;
 }
 
-static void no_read_unlock(unsigned bucket)
+static void *no_write_lock(unsigned bucket)
 {
-	return;
+	return NULL;
 }
 
-static void no_write_lock(unsigned bucket)
-{
-	return;
-}
-
-static void no_write_unlock(unsigned bucket)
+static void no_write_unlock(unsigned bucket, void *data)
 {
 	return;
 }

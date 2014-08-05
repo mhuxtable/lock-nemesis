@@ -130,11 +130,12 @@ static inline void process_read(ln_thread_t *thread)
 	u64 key;
 	ln_hash_entry_t *e;
 	u64 bucket;
+	void *lockdata;
 
 	get_random_bytes_arch(&key, sizeof(u64));
 	key = ln_rnd_key_mask(key);
 	bucket = hash_min(key, HASH_TABLE_BITS);
-	thread->ops->rlock(bucket);
+	lockdata = thread->ops->rlock(bucket);
 	hash_for_each_possible_rcu(hashtable, e, hash, key)
 	{
 		if (e->key == key)
@@ -142,7 +143,7 @@ static inline void process_read(ln_thread_t *thread)
 			if (unlikely(e->val != ln_rnd_key_get_val(key)))
 				thread->stats.verify_corrupt++;
 
-			thread->ops->runlock(bucket);
+			thread->ops->runlock(bucket, lockdata);
 			return;
 		}
 		else
@@ -150,7 +151,7 @@ static inline void process_read(ln_thread_t *thread)
 			continue;
 		}
 	}
-	thread->ops->runlock(bucket);
+	thread->ops->runlock(bucket, lockdata);
 
 	thread->stats.verify_miss++;
 	return;
@@ -158,6 +159,7 @@ static inline void process_read(ln_thread_t *thread)
 static inline void process_write(ln_thread_t *thread)
 {
 	u64 bucket;
+	void *lockdata;
 	ln_hash_entry_t *e = kmalloc(sizeof(ln_hash_entry_t), GFP_KERNEL);
 
 	if (unlikely(IS_ERR_OR_NULL(e)))
@@ -173,9 +175,9 @@ static inline void process_write(ln_thread_t *thread)
 
 	bucket = hash_min(e->key, HASH_TABLE_BITS);
 	
-	thread->ops->wlock(bucket);
+	lockdata = thread->ops->wlock(bucket);
 	hash_add_rcu(hashtable, &e->hash, e->key);
-	thread->ops->wunlock(bucket);
+	thread->ops->wunlock(bucket, lockdata);
 
 	return;
 }

@@ -17,25 +17,25 @@ static void ln_rwsem_setup(unsigned buckets)
   return;
 }
 
-static void ln_rwsem_rlock(unsigned bucket)
+static void *ln_rwsem_rlock(unsigned bucket)
 {
 	percpu_down_read(&locks[bucket]);
-	return;
+	return NULL;
 }
 
-static void ln_rwsem_runlock(unsigned bucket)
+static void ln_rwsem_runlock(unsigned bucket, void *data)
 {
 	percpu_up_read(&locks[bucket]);
 	return;
 }
 
-static void ln_rwsem_wlock(unsigned bucket)
+static void *ln_rwsem_wlock(unsigned bucket)
 {
 	percpu_down_write(&locks[bucket]);
-	return;
+	return NULL;
 }
 
-static void ln_rwsem_wunlock(unsigned bucket)
+static void ln_rwsem_wunlock(unsigned bucket, void *data)
 {
 	percpu_up_write(&locks[bucket]);
 	return;

@@ -20,25 +20,25 @@ static void ln_rcu_setup(unsigned buckets)
 	return;
 }
 
-static void ln_rcu_rlock(unsigned bucket)
+static void *ln_rcu_rlock(unsigned bucket)
 {
 	rcu_read_lock();
-	return;
+	return NULL;
 }
 
-static void ln_rcu_runlock(unsigned bucket)
+static void ln_rcu_runlock(unsigned bucket, void *data)
 {
 	rcu_read_unlock();
 	return;
 }
 
-static void ln_rcu_wlock(unsigned bucket)
+static void *ln_rcu_wlock(unsigned bucket)
 {
 	spin_lock(&locks[bucket]);
-	return;
+	return NULL;
 }
 
-static void ln_rcu_wunlock(unsigned bucket)
+static void ln_rcu_wunlock(unsigned bucket, void *data)
 {
 	spin_unlock(&locks[bucket]);
 	return;

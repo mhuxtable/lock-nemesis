@@ -11,13 +11,13 @@ static void ln_spin_setup(unsigned buckets)
 	return;
 }
 
-static void ln_spin_lock(unsigned bucket)
+static void *ln_spin_lock(unsigned bucket)
 {
 	spin_lock(&spinlock_lock);
-	return;
+	return NULL;
 }
 
-static void ln_spin_unlock(unsigned bucket)
+static void ln_spin_unlock(unsigned bucket, void *data)
 {
 	spin_unlock(&spinlock_lock);
 	return;

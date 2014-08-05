@@ -17,25 +17,25 @@ static void ln_spin_setup(unsigned buckets)
 	return;
 }
 
-static void ln_read_lock(unsigned bucket)
+static void *ln_read_lock(unsigned bucket)
 {
 	read_lock(&locks[bucket]);
-	return;
+	return NULL;
 }
 
-static void ln_read_unlock(unsigned bucket)
+static void ln_read_unlock(unsigned bucket, void *data)
 {
 	read_unlock(&locks[bucket]);
 	return;
 }
 
-static void ln_write_lock(unsigned bucket)
+static void *ln_write_lock(unsigned bucket)
 {
 	write_lock(&locks[bucket]);
-	return;
+	return NULL;
 }
 
-static void ln_write_unlock(unsigned bucket)
+static void ln_write_unlock(unsigned bucket, void *data)
 {
 	write_unlock(&locks[bucket]);
 	return;
