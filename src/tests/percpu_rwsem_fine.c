@@ -17,7 +17,17 @@ static void ln_rwsem_setup(unsigned buckets)
   return;
 }
 
-static void *ln_rwsem_rlock(unsigned bucket)
+static void *no_thread_setup(unsigned buckets)
+{
+	return NULL;
+}
+
+static void no_thread_teardown(void *data)
+{
+	return;
+}
+
+static void ln_rwsem_rlock(unsigned bucket, void *lockdata)
 {
 	percpu_down_read(&locks[bucket]);
 	return NULL;
@@ -29,7 +39,7 @@ static void ln_rwsem_runlock(unsigned bucket, void *data)
 	return;
 }
 
-static void *ln_rwsem_wlock(unsigned bucket)
+static void ln_rwsem_wlock(unsigned bucket, void *lockdata)
 {
 	percpu_down_write(&locks[bucket]);
 	return NULL;
@@ -58,6 +68,8 @@ ln_test_t test_percpu_rwsem_fine = {
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_rwsem_setup,
+	.ops.threadsetup = no_thread_setup,
+	.ops.threadteardown = no_thread_teardown,
 	.ops.rlock  = ln_rwsem_rlock,
 	.ops.runlock = ln_rwsem_runlock,
 	.ops.wlock = ln_rwsem_wlock,
