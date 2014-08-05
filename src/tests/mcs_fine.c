@@ -23,11 +23,11 @@ static void ln_mcs_thread_teardown(void *data)
 	vfree(data);
 }
 
-static void *ln_mcs_lock(unsigned bucket, void *lockdata)
+static void ln_mcs_lock(unsigned bucket, void *lockdata)
 {
 	struct mcs_spinlock *node = (struct mcs_spinlock *) lockdata;
 	mcs_spin_lock(&locks[bucket].next, node);
-	return node;
+	return;
 }
 
 static void ln_mcs_unlock(unsigned bucket, void *data)
