@@ -124,18 +124,17 @@ static inline oper_t get_op(void)
 		return op_read;
 }
 
-static inline void process_read(ln_thread_t *thread)
+static inline void process_read(ln_thread_t *thread, void *lockdata)
 {
 	/* Get a random key and look it up. */
 	u64 key;
 	ln_hash_entry_t *e;
 	u64 bucket;
-	void *lockdata;
 
 	get_random_bytes_arch(&key, sizeof(u64));
 	key = ln_rnd_key_mask(key);
 	bucket = hash_min(key, HASH_TABLE_BITS);
-	lockdata = thread->ops->rlock(bucket);
+	thread->ops->rlock(bucket, lockdata);
 	hash_for_each_possible_rcu(hashtable, e, hash, key)
 	{
 		if (e->key == key)
@@ -156,10 +155,9 @@ static inline void process_read(ln_thread_t *thread)
 	thread->stats.verify_miss++;
 	return;
 }
-static inline void process_write(ln_thread_t *thread)
+static inline void process_write(ln_thread_t *thread, void *lockdata)
 {
 	u64 bucket;
-	void *lockdata;
 	ln_hash_entry_t *e = kmalloc(sizeof(ln_hash_entry_t), GFP_KERNEL);
 
 	if (unlikely(IS_ERR_OR_NULL(e)))
@@ -175,7 +173,7 @@ static inline void process_write(ln_thread_t *thread)
 
 	bucket = hash_min(e->key, HASH_TABLE_BITS);
 	
-	lockdata = thread->ops->wlock(bucket);
+	thread->ops->wlock(bucket, lockdata);
 	hash_add_rcu(hashtable, &e->hash, e->key);
 	thread->ops->wunlock(bucket, lockdata);
 
@@ -185,6 +183,7 @@ static inline void process_write(ln_thread_t *thread)
 static int test_thread(void *data)
 {
 	ln_thread_t *thread = (ln_thread_t *) data;
+	void *lockdata = thread->ops->threadsetup(1 << HASH_TABLE_BITS);
 	thread->threadname  = thread->thread->comm;
 
 	/* The thread should run for 30 seconds, i.e. from current jiffies to jiffies
@@ -206,11 +205,11 @@ static int test_thread(void *data)
 		switch (op)
 		{
 			case op_read:
-				process_read(thread);
+				process_read(thread, lockdata);
 				thread->stats.reads++;
 				break;
 			case op_write:
-				process_write(thread);
+				process_write(thread, lockdata);
 				thread->stats.writes++;
 				break;
 		}
@@ -234,6 +233,8 @@ static int test_thread(void *data)
 	printk(KERN_ALERT "[Scaling Locks] [%s] 30 seconds elapsed, done.\n", 
 		thread->threadname);
 #endif
+
+	thread->ops->threadteardown(lockdata);
 
 	atomic_dec(&active_threads);
 	wake_up_all(&thread_wq);

@@ -13,19 +13,28 @@ static void ln_mcs_setup(unsigned buckets)
 	return;
 }
 
-static void *ln_mcs_lock(unsigned bucket)
+static void *ln_mcs_thread_setup(unsigned buckets)
 {
-	struct mcs_spinlock *node = (struct mcs_spinlock *) 
-		vmalloc(sizeof(struct mcs_spinlock));
+	return vmalloc(sizeof(struct mcs_spinlock));
+}
+
+static void ln_mcs_thread_teardown(void *data)
+{
+	vfree(data);
+}
+
+static void ln_mcs_lock(unsigned bucket, void *lockdata)
+{
+	struct mcs_spinlock *node = (struct mcs_spinlock *) lockdata;
 	mcs_spin_lock(&locks[bucket].next, node);
-	return node;
+	return;
 }
 
 static void ln_mcs_unlock(unsigned bucket, void *data)
 {
 	struct mcs_spinlock *node = (struct mcs_spinlock *) data;
 	mcs_spin_unlock(&locks[bucket].next, node);
-	vfree(data);
+	memset(data, 0, sizeof(struct mcs_spinlock));
 	return;
 }
 
@@ -43,6 +52,8 @@ ln_test_t test_mcs_fine = {
 	.min_threads = 1,
 	.max_threads = 12,
 	.ops.setup = ln_mcs_setup,
+	.ops.threadsetup = ln_mcs_thread_setup,
+	.ops.threadteardown = ln_mcs_thread_teardown,
 	.ops.rlock  = ln_mcs_lock,
 	.ops.runlock = ln_mcs_unlock,
 	.ops.wlock = ln_mcs_lock,
