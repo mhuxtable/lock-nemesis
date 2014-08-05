@@ -24,7 +24,7 @@ static void no_thread_teardown(void *data)
 static void ln_rwsem_rlock(unsigned bucket, void *lockdata)
 {
 	down_read(&semaphore_lock);
-	return NULL;
+	return;
 }
 
 static void ln_rwsem_runlock(unsigned bucket, void *data)
@@ -36,7 +36,7 @@ static void ln_rwsem_runlock(unsigned bucket, void *data)
 static void ln_rwsem_wlock(unsigned bucket, void *lockdata)
 {
 	down_write(&semaphore_lock);
-	return NULL;
+	return;
 }
 
 static void ln_rwsem_wunlock(unsigned bucket, void *data)

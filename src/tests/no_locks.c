@@ -19,7 +19,7 @@ static void no_thread_teardown(void *data)
 
 static void no_read_lock(unsigned bucket, void *lockdata)
 {
-	return NULL;
+	return;
 }
 
 static void no_read_unlock(unsigned bucket, void *data)
@@ -29,7 +29,7 @@ static void no_read_unlock(unsigned bucket, void *data)
 
 static void no_write_lock(unsigned bucket, void *lockdata)
 {
-	return NULL;
+	return;
 }
 
 static void no_write_unlock(unsigned bucket, void *data)

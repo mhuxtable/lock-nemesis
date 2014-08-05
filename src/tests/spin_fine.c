@@ -30,7 +30,7 @@ static void no_thread_teardown(void *data)
 static void ln_spin_lock(unsigned bucket, void *lockdata)
 {
 	spin_lock(&locks[bucket]);
-	return NULL;
+	return;
 }
 
 static void ln_spin_unlock(unsigned bucket, void *data)

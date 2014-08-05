@@ -33,7 +33,7 @@ static void no_thread_teardown(void *data)
 static void ln_rcu_rlock(unsigned bucket, void *lockdata)
 {
 	rcu_read_lock();
-	return NULL;
+	return;
 }
 
 static void ln_rcu_runlock(unsigned bucket, void *data)
@@ -45,7 +45,7 @@ static void ln_rcu_runlock(unsigned bucket, void *data)
 static void ln_rcu_wlock(unsigned bucket, void *lockdata)
 {
 	spin_lock(&locks[bucket]);
-	return NULL;
+	return;
 }
 
 static void ln_rcu_wunlock(unsigned bucket, void *data)

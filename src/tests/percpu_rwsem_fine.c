@@ -30,7 +30,7 @@ static void no_thread_teardown(void *data)
 static void ln_rwsem_rlock(unsigned bucket, void *lockdata)
 {
 	percpu_down_read(&locks[bucket]);
-	return NULL;
+	return;
 }
 
 static void ln_rwsem_runlock(unsigned bucket, void *data)
@@ -42,7 +42,7 @@ static void ln_rwsem_runlock(unsigned bucket, void *data)
 static void ln_rwsem_wlock(unsigned bucket, void *lockdata)
 {
 	percpu_down_write(&locks[bucket]);
-	return NULL;
+	return;
 }
 
 static void ln_rwsem_wunlock(unsigned bucket, void *data)
