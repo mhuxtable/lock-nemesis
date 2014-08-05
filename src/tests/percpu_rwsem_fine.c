@@ -8,13 +8,13 @@ static struct percpu_rw_semaphore *locks = NULL;
 
 static void ln_rwsem_setup(unsigned buckets)
 {
-  int lock;
-  locks = (struct percpu_rw_semaphore *) vmalloc(sizeof(struct percpu_rw_semaphore) * buckets);
+	int lock;
+	locks = (struct percpu_rw_semaphore *) vmalloc(sizeof(struct percpu_rw_semaphore) * buckets);
 
-  for (lock = 0; lock < buckets; lock++)
-    percpu_init_rwsem(&locks[lock]);
+	for (lock = 0; lock < buckets; lock++)
+		percpu_init_rwsem(&locks[lock]);
 
-  return;
+	return;
 }
 
 static void *no_thread_setup(unsigned buckets)
@@ -53,10 +53,10 @@ static void ln_rwsem_wunlock(unsigned bucket, void *data)
 
 static void ln_rwsem_teardown(unsigned buckets)
 {
-  int lock;
+	int lock;
 
-  for (lock = 0; lock < buckets; lock++)
-    percpu_free_rwsem(&locks[lock]);
+	for (lock = 0; lock < buckets; lock++)
+		percpu_free_rwsem(&locks[lock]);
 	locks = NULL;
 
 	return;
